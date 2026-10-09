@@ -1,0 +1,14 @@
+obstacle_zone_node:
+  ros__parameters:
+    zones_file: /home/ros/obstacle_zones.yaml
+    frame_id: map
+    robot_frame: base_link
+    target_nodes:
+      - /local_costmap/local_costmap
+      # Uncomment to also control global costmap:
+      # - /global_costmap/global_costmap
+    layer_parameter: obstacle_layer.enabled
+    check_rate: 10.0
+    tf_max_age: 1.0
+    exit_margin: 0.0
+    use_sim_time: false
