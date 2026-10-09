@@ -81,7 +81,7 @@ ros2 launch obstacle_zone_tools run.launch.py \
   zones_file:=/home/ros/obstacle_zones.yaml
 ```
 
-デフォルトの切り替え対象は`/local_costmap/local_costmap`のみです。実行中の四角はRVizのMarkerArrayで表示できます。
+デフォルトで`/local_costmap/local_costmap`と`/global_costmap/global_costmap`の両方を切り替えます。どれかの四角の内側では両方に`obstacle_layer.enabled: false`、すべての四角の外側では両方に`true`を要求します。実行中の四角はRVizのMarkerArrayで表示できます。
 
 実行用launchは保存済み領域の読み込み・自己位置判定・obstacle_layerの制御だけを行い、地図配信・RViz・Interactive Marker編集は起動しません。地図と自己位置推定は通常のロボット側構成を使用します。編集用launchを終了してから実行用launchを起動してください。
 
@@ -96,9 +96,9 @@ ros2 launch obstacle_zone_tools run.launch.py \
 
 rosbagやシミュレーションの時刻を使う場合は`use_sim_time:=true`も付けます。
 
-## 4. local / global両方を切り替える
+## 4. 切り替え対象を設定する
 
-`config/switch_params.yaml`を別の編集可能な場所にコピーし、パスと対象を設定します。
+local / globalの両方は追加設定なしで有効です。対象ノード名やレイヤー名を変更する場合は、`config/switch_params.yaml`を別の編集可能な場所にコピーし、パスと対象を設定します。
 
 ```yaml
 obstacle_zone_node:
@@ -148,6 +148,7 @@ zones:
 ```bash
 ros2 node list
 ros2 param get /local_costmap/local_costmap obstacle_layer.enabled
+ros2 param get /global_costmap/global_costmap obstacle_layer.enabled
 ros2 run tf2_ros tf2_echo map base_link
 ros2 topic echo /obstacle_zones/status
 ```
@@ -160,7 +161,6 @@ ros2 topic echo /obstacle_zones/status
 
 ```bash
 ros2 param set /local_costmap/local_costmap obstacle_layer.enabled true
-# globalも対象にした場合:
 ros2 param set /global_costmap/global_costmap obstacle_layer.enabled true
 ```
 

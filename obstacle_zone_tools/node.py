@@ -102,7 +102,7 @@ class ObstacleZoneNode(Node):
         defaults = {
             'zones_file': '~/obstacle_zones.yaml', 'frame_id': 'map',
             'robot_frame': 'base_link',
-            'target_nodes': ['/local_costmap/local_costmap'],
+            'target_nodes': ['/local_costmap/local_costmap', '/global_costmap/global_costmap'],
             'layer_parameter': 'obstacle_layer.enabled', 'check_rate': 10.0,
             'tf_max_age': 1.0, 'exit_margin': 0.0,
             'default_width': 2.0, 'default_height': 2.0,
