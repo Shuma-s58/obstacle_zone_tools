@@ -17,7 +17,7 @@ from visualization_msgs.msg import (Marker, MarkerArray, InteractiveMarker,
                                     InteractiveMarkerControl as Control,
                                     InteractiveMarkerFeedback as Feedback)
 from interactive_markers import InteractiveMarkerServer, MenuHandler
-from std_msgs.msg import String
+from std_msgs.msg import String, ColorRGBA
 from std_srvs.srv import Trigger
 from tf2_ros import Buffer, TransformListener, TransformException
 
@@ -222,12 +222,36 @@ class ObstacleZoneNode(Node):
     def plane_control(self, name):
         c = Control()
         c.name = name
-        # Interactive control X axis points along world Z; MOVE_PLANE is XY.
+        # Control X axis is vertical, so MOVE_PLANE remains in XY.
+        # Inherit the rectangle pose so its visible body follows its yaw.
         c.orientation = Quaternion(y=math.sqrt(0.5), w=math.sqrt(0.5))
-        c.orientation_mode = Control.FIXED
+        c.orientation_mode = Control.INHERIT
         c.interaction_mode = Control.MOVE_PLANE
         c.always_visible = True
         return c
+
+    def rotation_ring(self):
+        # Keep the original scale=0.8 ring dimensions (inner radius 0.4 m,
+        # outer radius 0.52 m), but lift its mesh above the move surface.
+        # The control and its rotation axis stay at the rectangle center.
+        ring = Marker()
+        ring.type = Marker.TRIANGLE_LIST
+        ring.pose.orientation.w = 1.0
+        ring.pose.position.z = 0.10
+        ring.scale.x = ring.scale.y = ring.scale.z = 1.0
+        ring.color.b, ring.color.a = 1.0, 1.0
+        inner, outer, steps = 0.4, 0.52, 36
+        for i in range(steps):
+            a, b = 2 * math.pi * i / steps, 2 * math.pi * (i + 1) / steps
+            ia = Point(x=inner * math.cos(a), y=inner * math.sin(a), z=0.0)
+            ib = Point(x=inner * math.cos(b), y=inner * math.sin(b), z=0.0)
+            oa = Point(x=outer * math.cos(a), y=outer * math.sin(a), z=0.0)
+            ob = Point(x=outer * math.cos(b), y=outer * math.sin(b), z=0.0)
+            ring.points.extend([ia, oa, ob, ia, ob, ib])
+            shade = 0.6 if i % 2 == 0 else 1.0
+            ring.colors.extend([ColorRGBA(r=0.0, g=0.0, b=shade, a=1.0)
+                                for _ in range(6)])
+        return ring
 
     def insert_zone(self, z, with_handle=True):
         m = self.base_marker(z.name, z.name, z.x, z.y, z.yaw)
@@ -236,6 +260,7 @@ class ObstacleZoneNode(Node):
         m.controls.append(move)
         rotate = self.plane_control('rotate_yaw')
         rotate.interaction_mode = Control.ROTATE_AXIS
+        rotate.markers.append(self.rotation_ring())
         m.controls.append(rotate)
         self.server.insert(m, feedback_callback=self.feedback)
         self.menu.apply(self.server, m.name)

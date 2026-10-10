@@ -13,12 +13,14 @@ Visualization Manager:
     - Class: rviz_default_plugins/Grid
       Name: Grid
       Enabled: true
+      Value: true
       Cell Size: 1
       Plane: XY
       Reference Frame: map
     - Class: rviz_default_plugins/Map
       Name: Map
       Enabled: true
+      Value: true
       Alpha: 0.7
       Topic:
         Value: /map
@@ -30,11 +32,17 @@ Visualization Manager:
     - Class: rviz_default_plugins/InteractiveMarkers
       Name: Zone Editor
       Enabled: true
-      Update Topic: /obstacle_zones/update
+      Interactive Markers Namespace: /obstacle_zones
+      Show Axes: false
+      Show Descriptions: true
+      Show Visual Aids: true
+      Enable Transparency: true
+      Value: true
     - Class: rviz_default_plugins/MarkerArray
       Name: Zone Outlines
       Enabled: true
-      Marker Topic:
+      Value: true
+      Topic:
         Value: /obstacle_zones/rectangles
         Depth: 10
         Reliability Policy: Reliable
